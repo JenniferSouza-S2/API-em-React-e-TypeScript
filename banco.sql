@@ -1,18 +1,15 @@
-create database dados;
-use dados;
+DROP TABLE IF EXISTS estudante;
 
-create table estudante(
-id int auto_increment not null,
-nome varchar(20) null,
-primary key(id));
+CREATE TABLE estudante (
+  id INT AUTO_INCREMENT NOT NULL,
+  nome VARCHAR(20) NULL,
+  email VARCHAR(100) NULL,
+  PRIMARY KEY (id)
+);
 
-insert into estudante values
-(1, 'Bruno'),
-(2, 'Vivian'),
-(3, 'Marco');
+INSERT INTO estudante (nome, email) VALUES
+('Bruno', NULL),
+('Vivian', NULL),
+('Marco', NULL);
 
-
-alter table estudante
-add column email varchar(100);
-
-select * from estudante;
+SELECT * FROM estudante;
