@@ -1,5 +1,5 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const API_URL = "http://localhost:3000/usuarios";
+  const API_URL = "http://localhost:3000/estudantes";
 
   const idInput = document.getElementById("idEstudante");
   const nomeInput = document.getElementById("nomeEstudante");
@@ -13,8 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const btnDeletar = document.getElementById("btnDeletar");
   const btnListarTodos = document.getElementById("btnListarTodos");
 
-
-  // Funções de API
+  // --- Funções de API ---
   async function listarTodos() {
     const res = await fetch(API_URL);
     const alunos = await res.json();
@@ -23,42 +22,42 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function buscarPorId(id) {
     const res = await fetch(`${API_URL}/${id}`);
+    if (res.status === 404) return null;
     return res.json();
   }
 
   async function inserirAluno() {
-    const dados = {
-      nome: nomeInput.value,
-      email: emailInput.value,
-    };
-
+    const dados = { nome: nomeInput.value, email: emailInput.value };
     const res = await fetch(API_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(dados),
     });
-
-    mostrarMensagem("Aluno inserido com sucesso!");
-    listarTodos();
+    if (res.ok) {
+      mostrarMensagem("Aluno inserido com sucesso!");
+      listarTodos();
+    } else {
+      mostrarMensagem("Erro ao inserir aluno", "red");
+    }
   }
 
   async function atualizarAluno() {
     const id = idInput.value;
     if (!id) return alert("Informe o ID do aluno para atualizar.");
 
-    const dados = {
-      nome: nomeInput.value,
-      email: emailInput.value,
-    };
-
-    await fetch(`${API_URL}/${id}`, {
+    const dados = { nome: nomeInput.value, email: emailInput.value };
+    const res = await fetch(`${API_URL}/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(dados),
     });
 
-    mostrarMensagem("Aluno atualizado com sucesso!");
-    listarTodos();
+    if (res.ok) {
+      mostrarMensagem("Aluno atualizado com sucesso!");
+      listarTodos();
+    } else {
+      mostrarMensagem("Erro ao atualizar aluno", "red");
+    }
   }
 
   async function deletarAluno() {
@@ -67,21 +66,23 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (!confirm("Tem certeza que deseja excluir este aluno?")) return;
 
-    await fetch(`${API_URL}/${id}`, { method: "DELETE" });
+    const res = await fetch(`${API_URL}/${id}`, { method: "DELETE" });
 
-    mostrarMensagem("Aluno deletado com sucesso!");
-    listarTodos();
+    if (res.ok) {
+      mostrarMensagem("Aluno deletado com sucesso!");
+      listarTodos();
+    } else {
+      mostrarMensagem("Erro ao deletar aluno", "red");
+    }
   }
 
-
-  // Interface
+  // --- Funções de interface ---
   function renderTabela(alunos) {
     corpoTabela.innerHTML = "";
-    if (alunos.length === 0) {
+    if (!alunos || alunos.length === 0) {
       corpoTabela.innerHTML = `<tr><td colspan="3">Nenhum aluno encontrado.</td></tr>`;
       return;
     }
-
     alunos.forEach((aluno) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
@@ -93,14 +94,13 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  function mostrarMensagem(texto) {
+  function mostrarMensagem(texto, cor = "green") {
     mensagem.textContent = texto;
-    mensagem.style.color = "green";
+    mensagem.style.color = cor;
     setTimeout(() => (mensagem.textContent = ""), 3000);
   }
 
-
-  // Eventos
+  // --- Eventos ---
   btnListarTodos.addEventListener("click", listarTodos);
   btnInserir.addEventListener("click", inserirAluno);
   btnBuscar.addEventListener("click", async () => {
@@ -116,4 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
   btnAtualizar.addEventListener("click", atualizarAluno);
   btnDeletar.addEventListener("click", deletarAluno);
+
+  // Lista todos ao carregar a página
+  listarTodos();
 });

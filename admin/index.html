@@ -1,50 +1,42 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Estudantes</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" defer></script>
+  <meta charset="UTF-8">
+  <title>Gerenciamento de Estudantes</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div class="container">
-    <h1>Painel de Administração de Estudantes</h1>
-    <div id="mensagem"></div>
+  <div class="container">
+    <h1>Gerenciamento de Estudantes</h1>
 
-    <h2>Dados do Estudante</h2>
     <div class="inputs">
-        <input type="text" id="idEstudante" placeholder="ID (para Buscar/Atualizar/Deletar)">
-        <input type="text" id="nomeEstudante" placeholder="Nome">
-        <input type="text" id="emailEstudante" placeholder="Email">
+      <input type="number" id="idEstudante" placeholder="ID">
+      <input type="text" id="nomeEstudante" placeholder="Nome">
+      <input type="email" id="emailEstudante" placeholder="Email">
     </div>
 
     <div class="crud-buttons">
-        <button id="btnInserir">Inserir</button>
-        <button id="btnBuscar">Buscar por ID</button>
-        <button id="btnAtualizar">Atualizar</button>
-        <button id="btnDeletar">Deletar</button>
+      <button id="btnListarTodos">Listar Todos</button>
+      <button id="btnBuscar">Buscar</button>
+      <button id="btnInserir">Inserir</button>
+      <button id="btnAtualizar">Atualizar</button>
+      <button id="btnDeletar">Deletar</button>
     </div>
 
-    <hr>
+    <div id="mensagem"></div>
 
-    <h2>Lista de Estudantes</h2>
-    <button id="btnListarTodos">Listar Todos</button>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nome</th>
+          <th>Email</th>
+        </tr>
+      </thead>
+      <tbody id="corpoTabela"></tbody>
+    </table>
+  </div>
 
-    <div class="tabela-wrapper">
-        <table id="tabelaUsuarios">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Nome</th>
-                    <th>Email</th>
-                </tr>
-            </thead>
-            <tbody id="corpoTabela">
-                <tr><td colspan="3">Clique em "Listar Todos" para carregar os dados.</td></tr>
-            </tbody>
-        </table>
-    </div>
-</div>
+  <script src="script.js"></script>
 </body>
 </html>
