@@ -4,106 +4,99 @@ import { fileURLToPath } from 'url';
 import { App } from './app.js';
 import cors from 'cors';
 
-const app = express(); // Mais usual chamar de app
+const app = express();
 const porta = 3000;
 
-// Configuração para __dirname em ES Modules
+// dirname
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDirectory = path.join(__dirname, 'admin');
 
-// Middlewares
 app.use(express.json());
-app.use(cors({
-    origin: 'http://127.0.0.1:5500' // Ajuste conforme a porta do frontend
-}));
+app.use(cors({ origin: "*", methods: ["GET", "POST", "PUT", "DELETE"] }));
 
-const crud = new App(); // Instância do seu CRUD
+const crud = new App();
 
-
-
-// Servir arquivos estáticos (HTML, CSS, JS)
 app.use(express.static(rootDirectory));
 
-// Rota padrão
 app.get('/', (req, res) => {
-    res.sendFile(path.join(rootDirectory, 'index.html'));
+    res.sendFile(path.join(rootDirectory, "index.html"));
 });
 
+/* ------- ROTAS ------- */
 
-// --- ROTAS RESTFUL USUÁRIOS ---
-
-// Listar todos os usuários
 app.get('/usuarios', async (req, res) => {
     try {
         const usuarios = await crud.executeSearchQuery();
-        res.status(200).json(usuarios);
-    } catch (error) {
-        console.error('Erro ao listar usuários:', error);
-        res.status(500).json({ message: 'Erro interno do servidor ao listar usuários.' });
+        res.json(usuarios);
+    } catch (e) {
+        console.log(e);
+        res.status(500).json({ message: "Erro interno ao listar usuários." });
     }
 });
 
-// Buscar usuário por ID
 app.get('/usuarios/:id', async (req, res) => {
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ message: 'ID de usuário inválido.' });
+    const id = Number(req.params.id);
+    if (isNaN(id)) return res.status(400).json({ message: "ID inválido" });
 
     try {
-        const usuario = await crud.searchQueryById(id);
-        if (!usuario) return res.status(404).json({ message: 'Usuário não encontrado.' });
-        res.status(200).json(usuario);
-    } catch (error) {
-        console.error(`Erro ao buscar usuário ${id}:`, error);
-        res.status(500).json({ message: 'Erro interno do servidor ao buscar usuário.' });
+        const user = await crud.searchQueryById(id);
+        if (!user) return res.status(404).json({ message: "Usuário não encontrado" });
+        res.json(user);
+    } catch (e) {
+        res.status(500).json({ message: "Erro interno ao buscar usuário" });
     }
 });
 
-// Inserir usuário
 app.post('/usuarios', async (req, res) => {
     const { nome, email } = req.body;
-    if (!nome || !email) return res.status(400).json({ message: 'Nome e email são obrigatórios.' });
+
+    if (!nome || !email) {
+        return res.status(400).json({ message: "Nome e email são obrigatórios" });
+    }
 
     try {
-        const novoUsuario = await crud.insertQuery(nome, email);
-        res.status(201).json({ message: 'Usuário inserido com sucesso!', usuario: novoUsuario });
-    } catch (error) {
-        console.error('Erro ao inserir usuário:', error);
-        res.status(500).json({ message: 'Erro interno do servidor ao inserir usuário.' });
+        const result = await crud.insertQuery(nome, email);
+        res.status(201).json({ message: "Criado!", id: result.insertId });
+    } catch (e) {
+        res.status(500).json({ message: "Erro ao inserir" });
     }
 });
 
-// Atualizar usuário
 app.put('/usuarios', async (req, res) => {
     const { id, nome, email } = req.body;
 
-    if (isNaN(id)) return res.status(400).json({ message: 'ID de usuário inválido.' });
-    if (!nome && !email) return res.status(400).json({ message: 'Informe ao menos nome ou email para atualização.' });
+    if (!id) return res.status(400).json({ message: "ID obrigatório" });
 
     try {
-        await crud.updateQuery(id, nome, email);
-        res.status(200).json({ message: `Usuário ${id} atualizado com sucesso!` });
-    } catch (error) {
-        console.error(`Erro ao atualizar usuário ${id}:`, error);
-        res.status(500).json({ message: 'Erro interno do servidor ao atualizar usuário.' });
+        const result = await crud.updateQuery(id, nome, email);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Nenhuma linha alterada" });
+        }
+
+        res.json({ message: "Atualizado!" });
+    } catch (e) {
+        res.status(500).json({ message: "Erro ao atualizar" });
     }
 });
 
-// Deletar usuário
 app.delete('/usuarios/:id', async (req, res) => {
-    const id = parseInt(req.params.id);
-    if (isNaN(id)) return res.status(400).json({ message: 'ID de usuário inválido.' });
+    const id = Number(req.params.id);
 
     try {
-        await crud.deleteQuery(id);
+        const result = await crud.deleteQuery(id);
+
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: "Não encontrado" });
+        }
+
         res.status(204).send();
-    } catch (error) {
-        console.error(`Erro ao deletar usuário ${id}:`, error);
-        res.status(500).json({ message: 'Erro interno do servidor ao deletar usuário.' });
+    } catch (e) {
+        res.status(500).json({ message: "Erro ao deletar" });
     }
 });
 
-// --- INICIAR SERVIDOR ---
 app.listen(porta, () => {
-    console.log(`API RESTful rodando em: http://localhost:${porta}`);
+    console.log(`API rodando em http://localhost:${porta}`);
 });
