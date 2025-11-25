@@ -22,11 +22,12 @@ Além da API, o projeto inclui uma interface frontend e backend desenvolvida em 
 ---
 
 ## Tecnologias Utilizadas
-**Node.js**
-**Express**
-**SQLite**
-**React**
-**TypeScript**
-**HTML5 / CSS3 / JavaScript**
+- **Node.js**
+- **Express**
+- **SQLite**
+- **React**
+- **TypeScript**
+- **HTML5 / CSS3 / JavaScript**
+
 
 
